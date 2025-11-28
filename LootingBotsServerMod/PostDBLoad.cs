@@ -30,8 +30,8 @@ public class PostDBLoad(
         var pathToMod = modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly());
         _config = modHelper.GetJsonDataFromFile<ConfigModel>(pathToMod, "Config/config.json");
 
-        var pmcConfig = configServer.GetConfig<PmcConfig>(ConfigTypes.PMC);
-        var botConfig = configServer.GetConfig<BotConfig>(ConfigTypes.BOT);
+        var pmcConfig = configServer.GetConfig<PmcConfig>();
+        var botConfig = configServer.GetConfig<BotConfig>();
 
         if (!_config.PmcSpawnWithLoot)
         {
@@ -41,9 +41,9 @@ public class PostDBLoad(
             pmcConfig.LooseWeaponInBackpackLootMinMax.Max = 0;
 
             // Clear weights in pmc randomisation
-            if (botConfig.Equipment?.Pmc?.Randomisation != null)
+            if (botConfig?.Equipment != null && botConfig.Equipment.TryGetValue("pmc", out var pmcFilters) && pmcFilters?.Randomisation != null)
             {
-                foreach (var details in botConfig.Equipment.Pmc.Randomisation)
+                foreach (var details in pmcFilters.Randomisation)
                 {
                     var generation = details?.Generation;
                     if (generation != null)

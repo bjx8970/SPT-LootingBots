@@ -5,7 +5,7 @@ using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Servers;
 
 namespace LootingBotsServerMod;
 
@@ -15,8 +15,8 @@ namespace LootingBotsServerMod;
 /// </summary>
 [Injectable(TypePriority = OnLoadOrder.PostDBModLoader + 1)]
 public class PostDBLoad(
-    DatabaseService databaseService,
-    ConfigService configService,
+    DatabaseServer databaseServer,
+    ConfigServer configServer,
     ModHelper modHelper,
     ISptLogger<PostDBLoad> logger
 ) : IOnLoad
@@ -29,8 +29,8 @@ public class PostDBLoad(
         var pathToMod = modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly());
         _config = modHelper.GetJsonDataFromFile<ConfigModel>(pathToMod, "Config/config.json");
 
-        var pmcConfig = configService.GetConfig(ConfigTypes.PMC);
-        var botConfig = configService.GetConfig(ConfigTypes.BOT);
+        var pmcConfig = configServer.GetConfig(ConfigTypes.PMC);
+        var botConfig = configServer.GetConfig(ConfigTypes.BOT);
 
         if (!_config.PmcSpawnWithLoot)
         {
@@ -62,7 +62,7 @@ public class PostDBLoad(
 
         logger.Info("Marking items with DiscardLimits as InsuranceDisabled");
 
-        var tables = databaseService.GetTables();
+        var tables = databaseServer.GetTables();
         foreach (var (itemId, template) in tables.Templates.Items)
         {
             /**

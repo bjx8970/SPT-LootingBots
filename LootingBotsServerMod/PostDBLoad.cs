@@ -4,6 +4,7 @@ using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Enums;
+using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 
@@ -29,8 +30,8 @@ public class PostDBLoad(
         var pathToMod = modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly());
         _config = modHelper.GetJsonDataFromFile<ConfigModel>(pathToMod, "Config/config.json");
 
-        var pmcConfig = configServer.GetConfig(ConfigTypes.PMC);
-        var botConfig = configServer.GetConfig(ConfigTypes.BOT);
+        var pmcConfig = configServer.GetConfig<PmcConfig>(ConfigTypes.PMC);
+        var botConfig = configServer.GetConfig<BotConfig>(ConfigTypes.BOT);
 
         if (!_config.PmcSpawnWithLoot)
         {
@@ -73,7 +74,7 @@ public class PostDBLoad(
              */
             if (
                 template.Properties.DiscardLimit >= 0
-                && !template.Properties.IsAlwaysAvailableForInsurance
+                && (template.Properties.IsAlwaysAvailableForInsurance != true)
             )
             {
                 template.Properties.InsuranceDisabled = true;
@@ -88,7 +89,7 @@ public class PostDBLoad(
 
     private void EmptyInventory(List<string> botTypes)
     {
-        var tables = databaseService.GetTables();
+        var tables = databaseServer.GetTables();
         foreach (var botType in botTypes)
         {
             logger.Info($"Removing loot from {botType}");

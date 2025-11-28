@@ -21,10 +21,10 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '9.0.x'
-        
-    - name: Setup NuGet sources
-      run: |
-        dotnet nuget add source https://api.nuget.org/v3/index.json -n nuget.org
+    
+    # NuGet source 'nuget.org' is available by default on GitHub runners; skip adding to avoid duplicates
+    - name: Verify .NET SDK
+      run: dotnet --info
         
     - name: Restore NuGet packages
       run: dotnet restore LootingBots.sln
